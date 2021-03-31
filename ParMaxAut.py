@@ -9,6 +9,7 @@ class Task:
 class TaskSystem:
     taskList = list()
     dictionary = {}
+    dictionary.update(taskList)
 
     def getDependencies(self, task, dictionary):  # Retourne la liste des dépendances d'une tâche
         return dictionary[task.name]
@@ -17,16 +18,16 @@ class TaskSystem:
         for i in task1.writes:
             for j in task2.reads:
                 if i == j:
-                    dictionary[task2.name] = task1.name
+                    dictionary[task2.name] += task1.name
         for i in task1.reads:
             for j in task2.writes:
                 if i == j:
-                    dictionary[task1.name] = task2.name
+                    dictionary[task1.name] += task2.name
         for i in task1.writes:
             for j in task2.writes:
                 if i == j:
-                    dictionary[task1.name] = task2.name
-                    dictionary[task2.name] = task1.name
+                    dictionary[task1.name] += task2.name
+                    dictionary[task2.name] += task1.name
 
     def dependencies(self, taskList, dictionary):
         for i in range(0, len(taskList) - 1):
