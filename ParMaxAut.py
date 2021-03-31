@@ -1,4 +1,3 @@
-
 class Task:
     name = ""  # Nom de la tâche, unique.
     reads = []  # Domaine de lecture de la tâche
@@ -7,9 +6,15 @@ class Task:
 
 
 class TaskSystem:
-    taskList = list()
-    dictionary = {}
-    dictionary.update(taskList)
+
+    def __init__(self,taskList):
+        self.taskList = taskList
+        self.dictionary = {}
+        self.fillDict(self.taskList,self.dictionary)
+
+    def fillDict(self, taskList, dictionary):
+        for i in range(len(taskList)):
+            dictionary[taskList[i]] = ""
 
     def getDependencies(self, task, dictionary):  # Retourne la liste des dépendances d'une tâche
         return dictionary[task.name]
@@ -72,9 +77,6 @@ tSomme.writes = ["Z"]
 tSomme.run = runTsomme
 
 if __name__ == "__init__":
-    t1.run()
-    t2.run()
-    tSomme.run()
-    print(X)
-    print(Y)
-    print(Z)
+    s1 = TaskSystem([t1, t2, tSomme])
+    s1.dependencies(s1.taskList,s1.dictionary)
+    print(s1.dictionary.items())
