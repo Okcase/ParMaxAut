@@ -7,9 +7,12 @@ class Task:
 
 
 class TaskSystem:
-    taskList = list()
-    dictionary = {}
-    dictionary.update(taskList)
+    taskList = list()  # Liste des tâches
+    dictionary = dict()  # Dictionnaire des tâches avec leurs dépendances
+
+    def fillDict(self, taskList, dictionary):
+        for i in range(len(taskList)):
+            dictionary[taskList[i].name] = list()
 
     def getDependencies(self, task, dictionary):  # Retourne la liste des dépendances d'une tâche
         return dictionary[task.name]
@@ -18,21 +21,24 @@ class TaskSystem:
         for i in task1.writes:
             for j in task2.reads:
                 if i == j:
-                    dictionary[task2.name] += task1.name
+                    dictionary[task2.name].append(task1.name)
         for i in task1.reads:
             for j in task2.writes:
                 if i == j:
-                    dictionary[task1.name] += task2.name
+                    dictionary[task1.name].append(task2.name)
         for i in task1.writes:
             for j in task2.writes:
                 if i == j:
-                    dictionary[task1.name] += task2.name
-                    dictionary[task2.name] += task1.name
+                    dictionary[task1.name].append(task2.name)
+                    dictionary[task2.name].append(task1.name)
 
-    def dependencies(self, taskList, dictionary):
+    def dependencies(self, taskList, dictionary):  # Cherche toutes les dépendances entre les tâches
         for i in range(0, len(taskList) - 1):
             for j in range(1, len(taskList)):
-                self.bernstein(taskList(i), taskList(j), dictionary)
+                self.bernstein(taskList[i], taskList[j], dictionary)
+
+    def run(self):
+        print()
 
 
 X = None
@@ -71,10 +77,15 @@ tSomme.reads = ["X", "Y"]
 tSomme.writes = ["Z"]
 tSomme.run = runTsomme
 
-if __name__ == "__init__":
-    t1.run()
-    t2.run()
-    tSomme.run()
-    print(X)
-    print(Y)
-    print(Z)
+"""t1.run()
+t2.run()
+tSomme.run()
+print(X)
+print(Y)
+print(Z)"""
+
+s1 = TaskSystem()
+s1.taskList = [t1, t2, tSomme]
+s1.fillDict(s1.taskList, s1.dictionary)
+#s1.dependencies(s1.taskList, s1.dictionary)
+print(s1.dictionary)
