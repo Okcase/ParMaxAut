@@ -18,21 +18,20 @@ class TaskSystem:
             for j in task2.reads:
                 if i == j:
                     dictionary[task2.name] = task1.name
-                    return True
         for i in task1.reads:
             for j in task2.writes:
                 if i == j:
                     dictionary[task1.name] = task2.name
-                    return True
         for i in task1.writes:
             for j in task2.writes:
                 if i == j:
                     dictionary[task1.name] = task2.name
                     dictionary[task2.name] = task1.name
-                    return True
-        return False
 
-    print()
+    def dependencies(self, taskList, dictionary):
+        for i in range(0, len(taskList) - 1):
+            for j in range(1, len(taskList)):
+                self.bernstein(taskList(i), taskList(j), dictionary)
 
 
 X = None
@@ -71,9 +70,10 @@ tSomme.reads = ["X", "Y"]
 tSomme.writes = ["Z"]
 tSomme.run = runTsomme
 
-t1.run()
-t2.run()
-tSomme.run()
-print(X)
-print(Y)
-print(Z)
+if __name__ == "__init__":
+    t1.run()
+    t2.run()
+    tSomme.run()
+    print(X)
+    print(Y)
+    print(Z)
