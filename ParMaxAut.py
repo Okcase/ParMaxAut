@@ -87,5 +87,5 @@ print(Z)"""
 s1 = TaskSystem()
 s1.taskList = [t1, t2, tSomme]
 s1.fillDict(s1.taskList, s1.dictionary)
-#s1.dependencies(s1.taskList, s1.dictionary)
+s1.dependencies(s1.taskList, s1.dictionary)
 print(s1.dictionary)
