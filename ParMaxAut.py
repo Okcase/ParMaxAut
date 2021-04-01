@@ -1,5 +1,3 @@
-import copy
-
 
 class Task:
     def __init__(self, name, reads, writes, run):
@@ -14,37 +12,38 @@ class TaskSystem:
         self.taskList = taskList  # Liste des tâches
         self.dictionary = dictionary  # Dictionnaire des tâches avec leurs dépendances
 
-    def fillDict(self, taskList, dictionary):  # Remplit le dictionnaire avec la liste des tâches
+    """def fillDict(self, taskList, dictionary):  # Remplit le dictionnaire avec la liste des tâches
         for i in range(len(taskList)):
-            dictionary[taskList[i].name] = list()
+            dictionary[taskList[i].name] = list()"""
 
     def getDependencies(self, task):  # Retourne la liste des dépendances d'une tâche
         return self.dictionary[task.name]
 
-    def bernstein(self, task1, task2, dictionary):  # Evaluation des conditions de Bernstein
+    def bernstein(self, task1, task2):  # Evaluation des conditions de Bernstein
         for i in task1.writes:
             for j in task2.reads:
                 if i == j:
-                    dictionary[task2.name].append(task1.name)
+                    return True
         for i in task1.reads:
             for j in task2.writes:
                 if i == j:
-                    dictionary[task1.name].append(task2.name)
+                    return True
         for i in task1.writes:
             for j in task2.writes:
                 if i == j:
-                    pass
-                    # dictionary[task1.name].append(task2.name)
-                    # dictionary[task2.name].append(task1.name)
+                    return True
+        return False
 
-    def dependencies(self, dictionary):  # Cherche toutes les dépendances entre les tâches
-        for i in range(0, len(self.taskList) - 1):
-            for j in range(1, len(self.taskList)):
-                self.bernstein(self.taskList[i], self.taskList[j], dictionary)
+    def dependencies(self):  # Cherche toutes les dépendances entre les tâches
+        for i in self.taskList:
+            for j in self.dictionary[i.name]:
+                for k in self.taskList:
+                    if j == k.name:
+                        if not self.bernstein(i, k):
+                            self.dictionary[i.name].remove(j)
 
     def run(self):
-        self.dependencies(self.dictionary)
-        dico = copy.deepcopy(self.dictionary)
+        self.dependencies()
 
 
 X = None
