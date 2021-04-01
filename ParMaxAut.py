@@ -1,48 +1,79 @@
+import copy
+import threading
+
+
 class Task:
-    name = ""  # Nom de la tâche, unique.
-    reads = []  # Domaine de lecture de la tâche
-    writes = []  # Domaine d'écriture de la tâche
-    run = None  # Fonction pour le comportement de la tâche
+    def __init__(self, name, reads, writes, run):
+        self.name = name  # Nom de la tâche, unique.
+        self.reads = reads  # Domaine de lecture de la tâche
+        self.writes = writes  # Domaine d'écriture de la tâche
+        self.run = run  # Fonction pour le comportement de la tâche
+
+    def getTaskFromName(self, name):
+        if self.name == name:
+            return self
+        else:
+            return None
 
 
 class TaskSystem:
+    def __init__(self, taskList, dictionary):
+        self.taskList = taskList  # Liste des tâches
+        self.dictionary = dictionary  # Dictionnaire des tâches avec leurs dépendances
 
-    def __init__(self,taskList):
-        self.taskList = taskList
-        self.dictionary = {}
-        self.fillDict(self.taskList,self.dictionary)
-
-    def fillDict(self, taskList, dictionary):
+    """def fillDict(self, taskList, dictionary):  # Remplit le dictionnaire avec la liste des tâches
         for i in range(len(taskList)):
-            dictionary[taskList[i]] = ""
+            dictionary[taskList[i].name] = list()"""
 
-    def getDependencies(self, task, dictionary):  # Retourne la liste des dépendances d'une tâche
-        return dictionary[task.name]
+    def getDependencies(self, task):  # Retourne la liste des dépendances d'une tâche
+        return self.dictionary[task.name]
 
-    def bernstein(self, task1, task2, dictionary):  # Evaluation des conditions de Bernstein
+    def bernstein(self, task1, task2):  # Evaluation des conditions de Bernstein
         for i in task1.writes:
             for j in task2.reads:
                 if i == j:
-                    dictionary[task2.name] += task1.name
+                    #dictionary[task2.name].append(task1.name)
+                    return True
         for i in task1.reads:
             for j in task2.writes:
                 if i == j:
-                    dictionary[task1.name] += task2.name
+                    #dictionary[task1.name].append(task2.name)
+                    return True
         for i in task1.writes:
             for j in task2.writes:
                 if i == j:
-                    dictionary[task1.name] += task2.name
-                    dictionary[task2.name] += task1.name
+                    return True
+        return False
+                    # dictionary[task1.name].append(task2.name)
+                    # dictionary[task2.name].append(task1.name)
 
-    def dependencies(self, taskList, dictionary):
-        for i in range(0, len(taskList) - 1):
-            for j in range(1, len(taskList)):
-                self.bernstein(taskList(i), taskList(j), dictionary)
+    def dependencies(self):  # Cherche toutes les dépendances entre les tâches
+        """for i in range(0, len(self.taskList) - 1):
+            for j in range(1, len(self.taskList)):
+                self.bernstein(self.taskList[i], self.taskList[j], dictionary)"""
+
+        for i in self.taskList:
+            for j in self.dictionary[i.name]:
+                taskDep = None
+                for k in self.taskList:
+                    if j == k.name:
+                        taskDep = k.getTaskFromName(j)
+                print(self.bernstein(i, taskDep))
+
+
+
+
+
+
+    def run(self):
+        self.dependencies()
+        dico = copy.deepcopy(self.dictionary)
 
 
 X = None
 Y = None
 Z = None
+W = None
 
 
 def runT1():
@@ -60,23 +91,24 @@ def runTsomme():
     Z = X + Y
 
 
-t1 = Task()
-t1.name = "T1"
-t1.writes = ["X"]
-t1.run = runT1
+def runTmulti():
+    global X, Y, W
+    W = X * Y
 
-t2 = Task()
-t2.name = "T2"
-t2.writes = ["Y"]
-t2.run = runT2
 
-tSomme = Task()
-tSomme.name = "somme"
-tSomme.reads = ["X", "Y"]
-tSomme.writes = ["Z"]
-tSomme.run = runTsomme
+t1 = Task("T1", [""], ["X"], runT1)
+t2 = Task("T2", [""], ["Y"], runT2)
+tSomme = Task("somme", ["X", "Y"], ["Z"], runTsomme)
+tMulti = Task("multi", ["X", "Y"], ["W"], runTmulti)
 
-if __name__ == "__init__":
-    s1 = TaskSystem([t1, t2, tSomme])
-    s1.dependencies(s1.taskList,s1.dictionary)
-    print(s1.dictionary.items())
+"""t1.run()
+t2.run()
+tSomme.run()
+print(X)
+print(Y)
+print(Z)"""
+
+s1 = TaskSystem([t1, t2, tSomme], {"T1": [], "T2": ["T1"], "somme": ["T1", "T2"]})
+s1.dependencies()
+# s1.dependencies(s1.taskList, s1.dictionary)
+#print(s1.dictionary)
