@@ -9,11 +9,14 @@ class Task:
         self.writes = writes  # Domaine d'écriture de la tâche
         self.run = run  # Fonction pour le comportement de la tâche
 
-    def getTaskFromName(self, name):
+    """def getTaskFromName(self, name):
         if self.name == name:
             return self
         else:
-            return None
+            return None"""
+
+    def getInfoFromTask(self):
+        return self.name, self.reads, self.writes
 
 
 class TaskSystem:
@@ -51,18 +54,15 @@ class TaskSystem:
         """for i in range(0, len(self.taskList) - 1):
             for j in range(1, len(self.taskList)):
                 self.bernstein(self.taskList[i], self.taskList[j], dictionary)"""
-
+        print(self.dictionary)
         for i in self.taskList:
             for j in self.dictionary[i.name]:
-                taskDep = None
                 for k in self.taskList:
                     if j == k.name:
-                        taskDep = k.getTaskFromName(j)
-                print(self.bernstein(i, taskDep))
-
-
-
-
+                        #taskDep = k.getTaskFromName(j)
+                        if not self.bernstein(i, k):
+                            self.dictionary[i.name].remove(j)
+        print(self.dictionary)
 
 
     def run(self):
