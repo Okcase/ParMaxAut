@@ -9,14 +9,17 @@ class Task:
         self.writes = writes  # Domaine d'écriture de la tâche
         self.run = run  # Fonction pour le comportement de la tâche
 
-    """def getTaskFromName(self, name):
+    def getTaskFromName(self, name):
         if self.name == name:
             return self
         else:
-            return None"""
+            return None
 
     def getInfoFromTask(self):
         return self.name, self.reads, self.writes
+
+    def removeTask(self):
+        del(self)
 
 
 class TaskSystem:
@@ -51,9 +54,6 @@ class TaskSystem:
                     # dictionary[task2.name].append(task1.name)
 
     def dependencies(self):  # Cherche toutes les dépendances entre les tâches
-        """for i in range(0, len(self.taskList) - 1):
-            for j in range(1, len(self.taskList)):
-                self.bernstein(self.taskList[i], self.taskList[j], dictionary)"""
         #print(self.dictionary)
         for i in self.taskList:
             for j in self.dictionary[i.name]:
@@ -66,22 +66,23 @@ class TaskSystem:
 
     def getKey(self, val):
         for key, value in self.dictionary.items():
-            if val == value:
-                return key
+            for i in value:
+                if val == i:
+                    return key
         return None
 
-    def run(self):
 
+    def run(self):
         self.dependencies()
+        ind = 0
         for i in self.taskList:
             if len(self.getDependencies(i)) == 0:
-                i.run
-                while self.getKey(i.name) != None:
+                i.run()
+                while self.getKey(i.name) is not None:
                     key = self.getKey(i.name)
                     self.dictionary[key].remove(i.name)
-                    
-
-
+                    self.dictionary.pop(key, None) # L'erreur viens de cette ligne
+            ind += 1
 
 
         #dico = copy.deepcopy(self.dictionary)
@@ -96,16 +97,17 @@ W = None
 def runT1():
     global X
     X = 1
-
+    return 1
 
 def runT2():
     global Y
     Y = 2
-
+    return 2
 
 def runTsomme():
     global X, Y, Z
     Z = X + Y
+    return 3
 
 
 def runTmulti():
@@ -126,9 +128,7 @@ tSomme.run()"""
 s1 = TaskSystem([t1, t2, tSomme], {"T1": [], "T2": ["T1"], "somme": ["T1", "T2"]})
 print(s1.dictionary)
 s1.run()
-print("X =",X)
-print("Y =",Y)
-print("Z =",Z)
+print("X =", X)
+print("Y =", Y)
+print("Z =", Z)
 print(s1.dictionary)
-# s1.dependencies(s1.taskList, s1.dictionary)
-#print(s1.dictionary)
