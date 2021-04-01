@@ -54,7 +54,7 @@ class TaskSystem:
         """for i in range(0, len(self.taskList) - 1):
             for j in range(1, len(self.taskList)):
                 self.bernstein(self.taskList[i], self.taskList[j], dictionary)"""
-        print(self.dictionary)
+        #print(self.dictionary)
         for i in self.taskList:
             for j in self.dictionary[i.name]:
                 for k in self.taskList:
@@ -62,12 +62,29 @@ class TaskSystem:
                         #taskDep = k.getTaskFromName(j)
                         if not self.bernstein(i, k):
                             self.dictionary[i.name].remove(j)
-        print(self.dictionary)
+        #print(self.dictionary)
 
+    def getKey(self, val):
+        for key, value in self.dictionary.items():
+            if val == value:
+                return key
+        return None
 
     def run(self):
+
         self.dependencies()
-        dico = copy.deepcopy(self.dictionary)
+        for i in self.taskList:
+            if len(self.getDependencies(i)) == 0:
+                i.run
+                while self.getKey(i.name) != None:
+                    key = self.getKey(i.name)
+                    self.dictionary[key].remove(i.name)
+                    
+
+
+
+
+        #dico = copy.deepcopy(self.dictionary)
 
 
 X = None
@@ -103,12 +120,15 @@ tMulti = Task("multi", ["X", "Y"], ["W"], runTmulti)
 
 """t1.run()
 t2.run()
-tSomme.run()
-print(X)
-print(Y)
-print(Z)"""
+tSomme.run()"""
+
 
 s1 = TaskSystem([t1, t2, tSomme], {"T1": [], "T2": ["T1"], "somme": ["T1", "T2"]})
-s1.dependencies()
+print(s1.dictionary)
+s1.run()
+print("X =",X)
+print("Y =",Y)
+print("Z =",Z)
+print(s1.dictionary)
 # s1.dependencies(s1.taskList, s1.dictionary)
 #print(s1.dictionary)
