@@ -63,14 +63,6 @@ class TaskSystem:
                             self.dictionary[i.name].remove(j)
         #print(self.dictionary)
 
-    def getKey(self, val):
-        for key, value in self.dictionary.items():
-            for i in value:
-                if val == i:
-                    return key
-        return None
-
-
     def run(self):
         self.dependencies()
         taskToDo = list()
