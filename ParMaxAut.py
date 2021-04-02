@@ -8,6 +8,7 @@ class Task:
         self.reads = reads  # Domaine de lecture de la tâche
         self.writes = writes  # Domaine d'écriture de la tâche
         self.run = run  # Fonction pour le comportement de la tâche
+        self.done = False
 
     def getTaskFromName(self, name):
         if self.name == name:
@@ -74,15 +75,17 @@ class TaskSystem:
 
     def run(self):
         self.dependencies()
-        ind = 0
         for i in self.taskList:
-            if len(self.getDependencies(i)) == 0:
+            if len(self.getDependencies(i)) == 0 and not i.done:
                 i.run()
+                i.done = True
                 while self.getKey(i.name) is not None:
                     key = self.getKey(i.name)
                     self.dictionary[key].remove(i.name)
-                    self.dictionary.pop(key, None) # L'erreur viens de cette ligne
-            ind += 1
+
+        for i in self.taskList:
+            if not i.done:
+                self.run()
 
 
         #dico = copy.deepcopy(self.dictionary)
@@ -109,7 +112,6 @@ def runTsomme():
     Z = X + Y
     return 3
 
-
 def runTmulti():
     global X, Y, W
     W = X * Y
@@ -125,10 +127,14 @@ t2.run()
 tSomme.run()"""
 
 
-s1 = TaskSystem([t1, t2, tSomme], {"T1": [], "T2": ["T1"], "somme": ["T1", "T2"]})
+s1 = TaskSystem([t1, t2, tSomme, tMulti], {"T1": [], "T2": ["T1"], "somme": ["T1", "T2"], "multi": ["T1", "T2"]})
 print(s1.dictionary)
 s1.run()
 print("X =", X)
 print("Y =", Y)
 print("Z =", Z)
+print("W =", W)
 print(s1.dictionary)
+
+for i in s1.taskList:
+    print(i.done)
