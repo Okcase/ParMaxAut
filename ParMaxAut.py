@@ -1,5 +1,5 @@
 import copy
-import threading
+from threading import Thread
 
 
 class Task:
@@ -8,6 +8,7 @@ class Task:
         self.reads = reads  # Domaine de lecture de la tâche
         self.writes = writes  # Domaine d'écriture de la tâche
         self.run = run  # Fonction pour le comportement de la tâche
+        self.isRunning = False
         self.done = False
 
     def getTaskFromName(self, name):
@@ -18,9 +19,6 @@ class Task:
 
     def getInfoFromTask(self):
         return self.name, self.reads, self.writes
-
-    def removeTask(self):
-        del(self)
 
 
 class TaskSystem:
@@ -75,20 +73,28 @@ class TaskSystem:
 
     def run(self):
         self.dependencies()
-        for i in self.taskList:
-            if len(self.getDependencies(i)) == 0 and not i.done:
-                i.run()
-                i.done = True
-                while self.getKey(i.name) is not None:
-                    key = self.getKey(i.name)
-                    self.dictionary[key].remove(i.name)
+        taskToDo = list()
+        threadList = []
+        for task in self.taskList:  # récupération des taches à faire
+            if len(self.getDependencies(task)) == 0 and not task.done and not task.isRunning:
+                taskToDo += task
 
-        for i in self.taskList:
-            if not i.done:
+        for task in taskToDo:  # Ajout des différents threads à faire, dans une liste
+            t = Thread(target=task.run)
+            task.isRunning = True
+            threadList.append(t)
+
+        for thread in threadList:
+            thread.start()
+
+        #
+        # Ici, il faut pouvoir détecter lorsque le thread est fini et de mettre la tache en question en done
+        #
+
+        for task in self.taskList:
+            if not task.done and not task.isRunning:
                 self.run()
 
-
-        #dico = copy.deepcopy(self.dictionary)
 
 
 X = None
