@@ -38,13 +38,17 @@ class TaskSystem:
                     return True
         return False
 
-    def dependencies(self, dictionnaire):  # Cherche les interférences entre chaque tâche adjacente
+    def dependencies(self, dictionary):  # Cherche les interférences entre chaque tâche adjacente
         for i in self.taskList:
-            for j in dictionnaire[i.name]:
-                for k in self.taskList:
-                    if j == k.name:
-                        if not self.bernstein(i, k):
-                            dictionnaire[i.name].remove(j)
+            tmp = self.getDependencies(i)
+            if tmp is None:
+                break
+            else:
+                for j in tmp:
+                    for k in self.taskList:
+                        if j == k.name:
+                            if not self.bernstein(i, k):
+                                dictionary[i.name].remove(j)
 
     def matriceVoisins(self):
         self.fillDict(self.voisins)
@@ -68,10 +72,31 @@ class TaskSystem:
                     tmp.append(i)
         return tmp
 
+    def launchTask(self, liste):
+        for i in self.taskList:
+            if i not in liste:
+                if self.getDependencies(i) is None:
+                    i.run()
+                    liste.append(i)
+                    self.removeDependencie(i)
+                    self.launchTask(liste)
+
+    def removeDependencie(self, task):
+        for task.name in self.dictionary:
+            if self.getDependencies(task) is None:
+                break
+            else:
+                for j in self.getDependencies(task):
+                    if task.name == j:
+                        self.dictionary[task.name].remove(j)
+
     def run(self):
         self.matriceChemins()
         self.matriceVoisins()
         self.dependencies(self.chemins)
+        self.dependencies(self.dictionary)
+        done = []
+        self.launchTask(done)
 
 
 M1, M2, M3, M4, M5 = None, None, None, None, None
@@ -133,17 +158,13 @@ dico = {"T8": ["T7"], "T7": ["T6", "T5"], "T5": ["T4", "T3"], "T6": ["T4"], "T3"
 
 system = TaskSystem(taches, dico)
 
-for e in system.voisins.items():
-    print(e)
-
-system.matriceChemins()
-
-for a in system.chemins.items():
-    print(a)
-
 system.run()
 
-for b in system.voisins.items():
-    print(b)
+"""for a in system.chemins.items():
+    print(a)
 
-print(system.getDependencies(T1))
+for b in system.voisins.items():
+    print(b)"""
+
+for c in system.dictionary.items():
+    print(c)
