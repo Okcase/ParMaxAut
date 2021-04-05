@@ -1,7 +1,3 @@
-global tmp
-
-tmp = []
-
 
 class Task:
     def __init__(self, name, reads, writes, run):
@@ -15,7 +11,8 @@ class TaskSystem:
     def __init__(self, taskList, dictionary):
         self.taskList = taskList  # Liste des tâches
         self.dictionary = dictionary  # Dictionnaire des tâches avec leurs dépendances
-        self.dictChemin = dict()
+        self.voisins = dict()  # Dictionnaire de la matrice d'adjacence
+        self.chemins = dict()  # Dictionnaire de la matrice des chemins
 
     def fillDict(self, dictionary):  # Remplit le dictionnaire avec la liste des tâches
         for i in range(len(self.taskList)):
@@ -39,37 +36,40 @@ class TaskSystem:
                     return True
         return False
 
-    def dependencies(self):  # Cherche toutes les dépendances entre les tâches
+    def dependencies(self):  # Cherche les interférences entre chaque tâche adjacente
         for i in self.taskList:
-            for j in self.dictionary[i.name]:
+            for j in self.chemins[i.name]:
                 for k in self.taskList:
                     if j == k.name:
                         if not self.bernstein(i, k):
-                            self.dictionary[i.name].remove(j)
+                            self.chemins[i.name].remove(j)
 
-    def chemin(self):
-        self.fillDict(self.dictChemin)
+    def matriceVoisins(self):
+        self.fillDict(self.voisins)
         for i in self.taskList:
             for j in self.dictionary:
                 if i.name in self.dictionary[j]:
-                    if j not in self.dictChemin:
-                        print()
+                    if j not in self.voisins[i.name]:
+                        self.voisins[i.name].append(j)
 
+    def matriceChemins(self):
+        tmp = []
+        for i in self.taskList:
+            self.chemins[i.name] = self.getAdjacent(i.name, tmp)
+            tmp = []
 
-
-    def remonter_taches(self, task, dictionary):
-        for p in dictionary:
-            if task in dictionary[p]:
-                if p not in tmp:
-                    self.remonter_taches(p, dictionary)
-                    tmp.append(p)
-        return reversed(tmp)
+    def getAdjacent(self, task, tmp):
+        for i in self.dictionary:
+            if task in self.dictionary[i]:
+                if i not in tmp:
+                    self.getAdjacent(i, tmp)
+                    tmp.append(i)
+        return tmp
 
     def run(self):
+        self.matriceChemins()
+        self.matriceVoisins()
         self.dependencies()
-        # th1 = threading.Thread(target=une def)
-        # th1.start()
-        # th1.join()
 
 
 M1, M2, M3, M4, M5 = None, None, None, None, None
@@ -130,7 +130,16 @@ taches = [T1, T2, T3, T4, T5, T6, T7, T8]
 dico = {"T8": ["T7"], "T7": ["T6", "T5"], "T5": ["T4", "T3"], "T6": ["T4"], "T3": ["T2"], "T4": ["T2"], "T2": ["T1"]}
 
 system = TaskSystem(taches, dico)
-chemin = system.remonter_taches(T1, dico)
-system.fillDict(system.dictChemin)
-for e in system.dictChemin.items():
+
+for e in system.voisins.items():
     print(e)
+
+system.matriceChemins()
+
+for a in system.chemins.items():
+    print(a)
+
+system.run()
+
+for b in system.chemins.items():
+    print(b)
