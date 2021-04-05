@@ -19,6 +19,8 @@ class TaskSystem:
             dictionary[self.taskList[i].name] = list()
 
     def getDependencies(self, task):  # Retourne la liste des dépendances d'une tâche
+        if task not in self.dictionary:
+            return None
         return self.dictionary[task.name]
 
     def bernstein(self, task1, task2):  # Evaluation des conditions de Bernstein
@@ -36,13 +38,13 @@ class TaskSystem:
                     return True
         return False
 
-    def dependencies(self):  # Cherche les interférences entre chaque tâche adjacente
+    def dependencies(self, dictionnaire):  # Cherche les interférences entre chaque tâche adjacente
         for i in self.taskList:
-            for j in self.chemins[i.name]:
+            for j in dictionnaire[i.name]:
                 for k in self.taskList:
                     if j == k.name:
                         if not self.bernstein(i, k):
-                            self.chemins[i.name].remove(j)
+                            dictionnaire[i.name].remove(j)
 
     def matriceVoisins(self):
         self.fillDict(self.voisins)
@@ -69,7 +71,7 @@ class TaskSystem:
     def run(self):
         self.matriceChemins()
         self.matriceVoisins()
-        self.dependencies()
+        self.dependencies(self.chemins)
 
 
 M1, M2, M3, M4, M5 = None, None, None, None, None
@@ -141,5 +143,7 @@ for a in system.chemins.items():
 
 system.run()
 
-for b in system.chemins.items():
+for b in system.voisins.items():
     print(b)
+
+print(system.getDependencies(T1))
