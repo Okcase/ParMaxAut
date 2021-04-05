@@ -82,13 +82,13 @@ class TaskSystem:
                     self.launchTask(liste)
 
     def removeDependencie(self, task):
-        for task.name in self.dictionary:
-            if self.getDependencies(task) is None:
+        for i in self.dictionary:
+            if self.dictionary[i] is None:
                 break
             else:
-                for j in self.getDependencies(task):
+                for j in self.dictionary[i]:
                     if task.name == j:
-                        self.dictionary[task.name].remove(j)
+                        self.dictionary[i].remove(j)
 
     def run(self):
         self.matriceChemins()
